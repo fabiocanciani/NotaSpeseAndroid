@@ -28,6 +28,8 @@
             android:layout_marginTop="12dp"/>
         <Button android:id="@+id/btnManuale" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Aggiungi spesa manualmente"/>
+        <Button android:id="@+id/btnEliminaPeriodo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Cancella spese dalla data / alla data"/>
 
         <TextView android:id="@+id/tvTotali" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:textStyle="bold"
@@ -39,6 +41,8 @@
         <Button android:id="@+id/btnPdf" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Genera PDF nota spese"
             android:layout_marginTop="16dp"/>
+        <Button android:id="@+id/btnStampa" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Stampa nota spese del mese"/>
         <Button android:id="@+id/btnCondividi" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Condividi ultimo PDF"/>
     </LinearLayout>
