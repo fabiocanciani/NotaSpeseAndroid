@@ -21,6 +21,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
+        setupSafeInsets()
         store = ExpenseStore(this)
 
         val p = store.profile()
@@ -77,6 +80,21 @@ class MainActivity : AppCompatActivity() {
             val f = lastPdf ?: PdfExporter.create(this, store.profile(), expensesForSelectedMonth()).also { lastPdf = it }
             sharePdf(f)
         }
+    }
+
+    private fun setupSafeInsets() {
+        val extraMargin = (32 * resources.displayMetrics.density).toInt()
+        ViewCompat.setOnApplyWindowInsetsListener(b.rootScroll) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                view.paddingLeft,
+                bars.top + extraMargin,
+                view.paddingRight,
+                bars.bottom + extraMargin
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(b.rootScroll)
     }
 
     private fun saveProfile() = store.saveProfile(
