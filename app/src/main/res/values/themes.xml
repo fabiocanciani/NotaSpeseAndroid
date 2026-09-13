@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.NotaSpese" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#1F4E79</item>
+        <item name="colorPrimaryVariant">#163A5C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+    </style>
+</resources>
