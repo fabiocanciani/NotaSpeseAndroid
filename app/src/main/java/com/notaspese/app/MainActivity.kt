@@ -5,6 +5,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.print.PrintManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -19,6 +26,8 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.notaspese.app.databinding.ActivityMainBinding
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,10 +61,17 @@ class MainActivity : AppCompatActivity() {
         b.btnSalvaProfilo.setOnClickListener { saveProfile(); toast("Intestazione salvata") }
         b.btnFoto.setOnClickListener { ensureCamera() }
         b.btnManuale.setOnClickListener { showExpenseDialog(null) }
+        b.btnEliminaPeriodo.setOnClickListener { showDeleteRangeDialog() }
         b.btnPdf.setOnClickListener {
             saveProfile()
             lastPdf = PdfExporter.create(this, store.profile(), expensesForSelectedMonth())
             toast("PDF creato")
+        }
+        b.btnStampa.setOnClickListener {
+            saveProfile()
+            val f = PdfExporter.create(this, store.profile(), expensesForSelectedMonth())
+            lastPdf = f
+            printPdf(f)
         }
         b.btnCondividi.setOnClickListener {
             val f = lastPdf ?: PdfExporter.create(this, store.profile(), expensesForSelectedMonth()).also { lastPdf = it }
@@ -119,6 +135,51 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Annulla", null).show()
     }
 
+    private fun showDeleteRangeDialog() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48,12,48,0) }
+        val from = EditText(this).apply { hint = "Dalla data (GG/MM/AAAA)"; box.addView(this) }
+        val to = EditText(this).apply { hint = "Alla data (GG/MM/AAAA)"; box.addView(this) }
+
+        AlertDialog.Builder(this)
+            .setTitle("Cancella spese per periodo")
+            .setMessage("Verranno eliminate tutte le spese comprese tra le due date, incluse.")
+            .setView(box)
+            .setPositiveButton("Continua") { _, _ ->
+                val parser = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).apply { isLenient = false }
+                val start = try { parser.parse(from.text.toString().trim()) } catch (_: Exception) { null }
+                val end = try { parser.parse(to.text.toString().trim()) } catch (_: Exception) { null }
+                if (start == null || end == null || start.after(end)) {
+                    toast("Inserisci un intervallo di date valido.")
+                    return@setPositiveButton
+                }
+                val matches = expenses.filter { e ->
+                    try {
+                        val d = parser.parse(e.date) ?: return@filter false
+                        !d.before(start) && !d.after(end)
+                    } catch (_: Exception) { false }
+                }
+                if (matches.isEmpty()) {
+                    toast("Nessuna spesa trovata nel periodo indicato.")
+                    return@setPositiveButton
+                }
+                AlertDialog.Builder(this)
+                    .setTitle("Conferma eliminazione")
+                    .setMessage("Eliminare ${matches.size} spese dal ${from.text} al ${to.text}?")
+                    .setPositiveButton("Elimina") { _, _ ->
+                        matches.forEach { it.imagePath?.let { path -> File(path).delete() } }
+                        val ids = matches.map { it.id }.toSet()
+                        expenses.removeAll { it.id in ids }
+                        store.saveExpenses(expenses)
+                        refresh()
+                        toast("${matches.size} spese eliminate.")
+                    }
+                    .setNegativeButton("Annulla", null)
+                    .show()
+            }
+            .setNegativeButton("Annulla", null)
+            .show()
+    }
+
     private fun refresh() {
         b.containerSpese.removeAllViews()
         val list = expensesForSelectedMonth()
@@ -150,6 +211,44 @@ class MainActivity : AppCompatActivity() {
                     store.saveExpenses(expenses); refresh()
                 }
             }.show()
+    }
+
+    private fun printPdf(file: File) {
+        val printManager = getSystemService(PRINT_SERVICE) as PrintManager
+        val adapter = object : PrintDocumentAdapter() {
+            override fun onLayout(
+                oldAttributes: PrintAttributes?, newAttributes: PrintAttributes?,
+                cancellationSignal: CancellationSignal?, callback: LayoutResultCallback?, extras: Bundle?
+            ) {
+                if (cancellationSignal?.isCanceled == true) {
+                    callback?.onLayoutCancelled(); return
+                }
+                val info = PrintDocumentInfo.Builder(file.name)
+                    .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                    .setPageCount(PrintDocumentInfo.PAGE_COUNT_UNKNOWN)
+                    .build()
+                callback?.onLayoutFinished(info, true)
+            }
+
+            override fun onWrite(
+                pages: Array<out PageRange>?, destination: ParcelFileDescriptor?,
+                cancellationSignal: CancellationSignal?, callback: WriteResultCallback?
+            ) {
+                if (destination == null) {
+                    callback?.onWriteFailed("Destinazione di stampa non disponibile"); return
+                }
+                try {
+                    FileInputStream(file).use { input ->
+                        FileOutputStream(destination.fileDescriptor).use { output -> input.copyTo(output) }
+                    }
+                    callback?.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
+                } catch (e: Exception) {
+                    callback?.onWriteFailed(e.message)
+                }
+            }
+        }
+        val month = b.etMese.text.toString().trim().ifBlank { "mese" }
+        printManager.print("Nota Spese $month", adapter, PrintAttributes.Builder().build())
     }
 
     private fun sharePdf(file: File) {
