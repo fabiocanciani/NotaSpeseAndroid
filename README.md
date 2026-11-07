@@ -25,3 +25,6 @@ Nota: l'OCR può richiedere correzioni manuali su scontrini poco leggibili.
 Il progetto include `.github/workflows/build-apk.yml`.
 Caricando il progetto su GitHub, il workflow `Build Android APK` compila automaticamente l'APK debug.
 Al termine, scaricare l'artifact `NotaSpese-APK`, che contiene `app-debug.apk`.
+
+## Compilazione novembre 2026
+Verifica automatica APK per installazione Android.
