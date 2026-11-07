@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
@@ -41,6 +43,10 @@ class MainActivity : AppCompatActivity() {
     private var currentPhoto: File? = null
     private var lastPdf: File? = null
 
+    private val chooseDocument = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) importDocument(uri)
+    }
+
     private val takePicture = registerForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
         if (ok) currentPhoto?.let { runOcr(it) }
     }
@@ -63,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         b.btnSalvaProfilo.setOnClickListener { saveProfile(); toast("Intestazione salvata") }
         b.btnFoto.setOnClickListener { ensureCamera() }
+        b.btnImporta.setOnClickListener { chooseDocument.launch(arrayOf("application/pdf", "image/jpeg", "image/png")) }
         b.btnManuale.setOnClickListener { showExpenseDialog(null) }
         b.btnEliminaPeriodo.setOnClickListener { showDeleteRangeDialog() }
         b.btnPdf.setOnClickListener {
@@ -112,6 +119,60 @@ class MainActivity : AppCompatActivity() {
         currentPhoto = File(dir, "receipt_${System.currentTimeMillis()}.jpg")
         val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", currentPhoto!!)
         takePicture.launch(uri)
+    }
+
+
+    private fun importDocument(uri: Uri) {
+        try {
+            val mime = contentResolver.getType(uri) ?: ""
+            val isPdf = mime == "application/pdf"
+            val extension = if (isPdf) "pdf" else if (mime == "image/png") "png" else "jpg"
+            val dir = File(filesDir, "receipts").apply { mkdirs() }
+            val file = File(dir, "import_${System.currentTimeMillis()}.$extension")
+            contentResolver.openInputStream(uri)?.use { input ->
+                file.outputStream().use { output -> input.copyTo(output) }
+            } ?: throw IllegalStateException("File non leggibile")
+            if (isPdf) runPdfOcr(file) else runOcr(file)
+        } catch (e: Exception) {
+            toast("Impossibile importare il documento: ${e.localizedMessage}")
+        }
+    }
+
+    private fun runPdfOcr(file: File) {
+        try {
+            val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            val renderer = PdfRenderer(descriptor)
+            if (renderer.pageCount == 0) {
+                renderer.close(); descriptor.close(); throw IllegalArgumentException("PDF vuoto")
+            }
+            val page = renderer.openPage(0)
+            val scale = minOf(2f, 2200f / maxOf(page.width, page.height))
+            val bitmap = Bitmap.createBitmap(
+                (page.width * scale).toInt().coerceAtLeast(1),
+                (page.height * scale).toInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888
+            )
+            bitmap.eraseColor(android.graphics.Color.WHITE)
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            page.close(); renderer.close(); descriptor.close()
+            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                .process(InputImage.fromBitmap(bitmap, 0))
+                .addOnSuccessListener { result ->
+                    bitmap.recycle()
+                    val parsed = ReceiptParser.parse(result.text)
+                    showExpenseDialog(Expense(
+                        date = parsed.date.ifBlank { today() }, merchant = parsed.merchant,
+                        amount = parsed.amount, currency = parsed.currency, imagePath = file.absolutePath
+                    ))
+                }
+                .addOnFailureListener {
+                    bitmap.recycle()
+                    toast("OCR PDF non riuscito: inserisci i dati manualmente")
+                    showExpenseDialog(Expense(date=today(), merchant="", amount=0.0, currency="CHF", imagePath=file.absolutePath))
+                }
+        } catch (e: Exception) {
+            toast("PDF non leggibile: ${e.localizedMessage}")
+            showExpenseDialog(Expense(date=today(), merchant="", amount=0.0, currency="CHF", imagePath=file.absolutePath))
+        }
     }
 
     private fun runOcr(file: File) {
