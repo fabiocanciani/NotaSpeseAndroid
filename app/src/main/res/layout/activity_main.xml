@@ -31,6 +31,8 @@
         <Button android:id="@+id/btnFoto" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Scatta foto scontrino"
             android:layout_marginTop="12dp"/>
+        <Button android:id="@+id/btnImporta" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Importa PDF, JPG o PNG"/>
         <Button android:id="@+id/btnManuale" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Aggiungi spesa manualmente"/>
         <Button android:id="@+id/btnEliminaPeriodo" android:layout_width="match_parent"
