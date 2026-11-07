@@ -3,6 +3,8 @@ package com.notaspese.app
 import android.content.Context
 import android.graphics.*
 import android.graphics.pdf.PdfDocument
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
 import java.io.File
 import java.io.FileOutputStream
 import java.text.DecimalFormat
@@ -134,27 +136,53 @@ object PdfExporter {
         footer(canvas, currentPageNumber)
         pdf.finishPage(page)
 
+
         expenses.filter { !it.imagePath.isNullOrBlank() }.forEach { e ->
             val f = File(e.imagePath!!)
             if (f.exists()) {
-                currentPageNumber++
-                val p = newPage()
-                val c = p.canvas
-                c.drawText(profile["azienda"].orEmpty().ifBlank { "AZIENDA" }, 35f, 48f, subtitle)
-                c.drawText("GIUSTIFICATIVO DI SPESA", 35f, 80f, title)
-                c.drawLine(35f, 94f, 560f, 94f, darkLine)
-                c.drawText("${e.date}   |   ${e.merchant.take(42)}   |   ${e.currency} ${df.format(e.amount)}", 35f, 120f, bold)
-
-                val bmp = BitmapFactory.decodeFile(f.absolutePath)
-                if (bmp != null) {
-                    val ratio = minOf(525f / bmp.width, 635f / bmp.height)
-                    val w = bmp.width * ratio
-                    val h = bmp.height * ratio
-                    c.drawBitmap(bmp, null, RectF((595f - w) / 2f, 145f, (595f + w) / 2f, 145f + h), black)
-                    bmp.recycle()
+                fun addAttachment(bitmap: Bitmap, attachmentIndex: Int = 1) {
+                    currentPageNumber++
+                    val p = newPage()
+                    val c = p.canvas
+                    c.drawText(profile["azienda"].orEmpty().ifBlank { "AZIENDA" }, 35f, 48f, subtitle)
+                    c.drawText("GIUSTIFICATIVO DI SPESA", 35f, 80f, title)
+                    c.drawLine(35f, 94f, 560f, 94f, darkLine)
+                    c.drawText("${e.date}   |   ${e.merchant.take(42)}   |   ${e.currency} ${df.format(e.amount)}", 35f, 120f, bold)
+                    val ratio = minOf(525f / bitmap.width, 635f / bitmap.height)
+                    val w = bitmap.width * ratio
+                    val h = bitmap.height * ratio
+                    c.drawBitmap(bitmap, null, RectF((595f - w) / 2f, 145f, (595f + w) / 2f, 145f + h), black)
+                    footer(c, currentPageNumber)
+                    pdf.finishPage(p)
                 }
-                footer(c, currentPageNumber)
-                pdf.finishPage(p)
+                if (f.extension.equals("pdf", ignoreCase = true)) {
+                    try {
+                        val descriptor = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY)
+                        val renderer = PdfRenderer(descriptor)
+                        for (i in 0 until renderer.pageCount) {
+                            val src = renderer.openPage(i)
+                            val scale = minOf(2f, 2000f / maxOf(src.width, src.height))
+                            val bitmap = Bitmap.createBitmap(
+                                (src.width * scale).toInt().coerceAtLeast(1),
+                                (src.height * scale).toInt().coerceAtLeast(1),
+                                Bitmap.Config.ARGB_8888
+                            )
+                            bitmap.eraseColor(Color.WHITE)
+                            src.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            src.close()
+                            addAttachment(bitmap, i + 1)
+                            bitmap.recycle()
+                        }
+                        renderer.close()
+                        descriptor.close()
+                    } catch (_: Exception) { }
+                } else {
+                    val bmp = BitmapFactory.decodeFile(f.absolutePath)
+                    if (bmp != null) {
+                        addAttachment(bmp)
+                        bmp.recycle()
+                    }
+                }
             }
         }
 
