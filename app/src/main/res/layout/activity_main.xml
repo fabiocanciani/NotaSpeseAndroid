@@ -1,65 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/rootScroll"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:fillViewport="true"
-    android:scrollbars="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Spese • riepilogo" android:textStyle="bold" android:textSize="30sp" android:textColor="#0B477D"
-            android:layout_marginBottom="12dp"/>
-
-        <Button android:id="@+id/toggleProfilo" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Dati personali  ▾"/>
-        <LinearLayout android:id="@+id/profiloDettagli" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:orientation="vertical"
-            android:padding="12dp" android:background="#EAF3FA">
-        <EditText android:id="@+id/etNome" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="Nome"/>
-        <EditText android:id="@+id/etCognome" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="Cognome"/>
-        <EditText android:id="@+id/etAzienda" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="Azienda di riferimento"/>
-        <EditText android:id="@+id/etMese" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="Mese (AAAA-MM)"/>
-
-        <Button android:id="@+id/btnSalvaProfilo" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Salva intestazione"/>
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#F4F7FC" android:fillViewport="true" android:clipToPadding="false">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingStart="20dp" android:paddingEnd="20dp" android:paddingBottom="32dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="8dp">
+            <ImageView android:layout_width="52dp" android:layout_height="52dp"
+                android:src="@drawable/ic_spese" android:contentDescription="Logo Spese"/>
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical" android:paddingStart="12dp">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Spese" android:textSize="30sp" android:textStyle="bold" android:textColor="#132C4D"/>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Il tuo registro, sempre in ordine" android:textSize="13sp" android:textColor="#61758E"/>
+            </LinearLayout>
         </LinearLayout>
-        <Button android:id="@+id/btnFoto" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Fotografa scontrino"
-            android:layout_marginTop="12dp"/>
-        <Button android:id="@+id/btnImporta" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Importa PDF, JPG o PNG"/>
-        <Button android:id="@+id/btnManuale" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="＋  Aggiungi spesa"/>
-        <Button android:id="@+id/btnEliminaPeriodo" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Gestisci / elimina spese per periodo"/>
-
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:orientation="vertical" android:padding="20dp"
+            android:background="@drawable/bg_dashboard">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="RIEPILOGO DEL MESE" android:textSize="12sp" android:textStyle="bold" android:letterSpacing="0.12"
+                android:textColor="#B6D6F2"/>
+            <TextView android:id="@+id/tvTotali" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:text="Nessuna spesa" android:textColor="#FFFFFF" android:textSize="25sp"
+                android:textStyle="bold" android:paddingBottom="6dp"/>
+            <TextView android:id="@+id/tvNumeroSpese" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="0 movimenti"
+                android:textSize="13sp" android:textColor="#D4E6FA"/>
+        </LinearLayout>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Riepilogo mensile" android:textStyle="bold" android:textSize="20sp"
-            android:textColor="#0B477D" android:paddingTop="16dp"/>
-        <TextView android:id="@+id/tvTotali" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:textStyle="bold"
-            android:textSize="18sp" android:paddingTop="12dp" android:paddingBottom="8dp"/>
-
+            android:layout_marginTop="26dp" android:layout_marginBottom="10dp"
+            android:text="Aggiungi una spesa" android:textSize="20sp" android:textStyle="bold" android:textColor="#132C4D"/>
+        <Button android:id="@+id/btnFoto" android:layout_width="match_parent" android:layout_height="56dp"
+            android:text="📷   Fotografa uno scontrino" android:textAllCaps="false"
+            android:textSize="16sp" android:textColor="#FFFFFF" android:backgroundTint="#1269D3"/>
+        <Button android:id="@+id/btnImporta" android:layout_width="match_parent" android:layout_height="54dp"
+            android:layout_marginTop="6dp" android:text="📎   Importa PDF, JPG o PNG"
+            android:textAllCaps="false" android:textSize="15sp" android:textColor="#18579A" android:backgroundTint="#DFEBFA"/>
+        <Button android:id="@+id/btnManuale" android:layout_width="match_parent" android:layout_height="54dp"
+            android:layout_marginTop="6dp" android:text="＋   Inserimento manuale"
+            android:textAllCaps="false" android:textSize="15sp" android:textColor="#18579A" android:backgroundTint="#DFEBFA"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:layout_marginBottom="8dp"
+            android:text="Impostazioni e periodo" android:textSize="20sp" android:textStyle="bold" android:textColor="#132C4D"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:background="@drawable/bg_surface" android:padding="12dp">
+            <Button android:id="@+id/toggleProfilo" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="▾   Dati personali e mese"
+                android:textAllCaps="false" android:textColor="#173B62" android:backgroundTint="#EAF2FC"/>
+            <LinearLayout android:id="@+id/profiloDettagli" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:padding="6dp">
+                <EditText android:id="@+id/etNome" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Nome" android:inputType="textPersonName"/>
+                <EditText android:id="@+id/etCognome" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Cognome" android:inputType="textPersonName"/>
+                <EditText android:id="@+id/etAzienda" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Azienda di riferimento" android:inputType="textCapWords"/>
+                <EditText android:id="@+id/etMese" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Mese (AAAA-MM)" android:inputType="date"/>
+                <Button android:id="@+id/btnSalvaProfilo" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="Salva dati e aggiorna mese" android:textAllCaps="false"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="24dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content" android:text="Movimenti" android:textSize="20sp"
+                android:textStyle="bold" android:textColor="#132C4D"/>
+            <TextView android:id="@+id/tvConteggio" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="0" android:textSize="14sp"
+                android:textColor="#1269D3" android:padding="8dp"/>
+        </LinearLayout>
         <LinearLayout android:id="@+id/containerSpese" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical"/>
-
-        <Button android:id="@+id/btnPdf" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Esporta riepilogo PDF"
-            android:layout_marginTop="16dp"/>
-        <Button android:id="@+id/btnStampa" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Stampa nota spese del mese"/>
-        <Button android:id="@+id/btnCondividi" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Condividi ultimo PDF"/>
+        <Button android:id="@+id/btnEliminaPeriodo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="10dp"
+            android:text="Gestisci eliminazione per periodo" android:textAllCaps="false"
+            android:textColor="#A23846" android:backgroundTint="#FCE9ED"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="26dp" android:layout_marginBottom="8dp"
+            android:text="Report e documenti" android:textSize="20sp" android:textStyle="bold" android:textColor="#132C4D"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="12dp" android:background="@drawable/bg_surface">
+            <Button android:id="@+id/btnPdf" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="▣   Genera report PDF"
+                android:textAllCaps="false" android:textColor="#FFFFFF" android:backgroundTint="#1269D3"/>
+            <Button android:id="@+id/btnStampa" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="▤   Stampa report"
+                android:textAllCaps="false" android:textColor="#18579A" android:backgroundTint="#DFEBFA"/>
+            <Button android:id="@+id/btnCondividi" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="↗   Condividi PDF"
+                android:textAllCaps="false" android:textColor="#18579A" android:backgroundTint="#DFEBFA"/>
+        </LinearLayout>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:gravity="center"
+            android:text="Spese • Documenti conservati sul dispositivo" android:textSize="12sp" android:textColor="#8798AC"/>
     </LinearLayout>
 </ScrollView>
