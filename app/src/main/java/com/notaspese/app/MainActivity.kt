@@ -15,6 +15,9 @@ import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
 import android.print.PrintManager
 import android.view.View
+import android.graphics.Color
+import android.graphics.Typeface
+import android.view.Gravity
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -75,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             b.toggleProfilo.text =
                 if (b.profiloDettagli.visibility == View.VISIBLE) "👤  Dati personali  ▴" else "👤  Dati personali  ▾"
         }
-        b.btnSalvaProfilo.setOnClickListener { saveProfile(); toast("Intestazione salvata") }
+        b.btnSalvaProfilo.setOnClickListener { saveProfile(); refresh(); b.profiloDettagli.visibility = View.GONE; b.toggleProfilo.text = "▾   Dati personali e mese"; toast("Dati salvati") }
         b.btnFoto.setOnClickListener { ensureCamera() }
         b.btnImporta.setOnClickListener { chooseDocument.launch(arrayOf("application/pdf", "image/jpeg", "image/png")) }
         b.btnManuale.setOnClickListener { showExpenseDialog(null) }
@@ -270,16 +273,71 @@ class MainActivity : AppCompatActivity() {
     private fun refresh() {
         b.containerSpese.removeAllViews()
         val list = expensesForSelectedMonth()
-        list.forEach { e ->
-            val row = TextView(this).apply {
-                text = "${e.date}   ${e.merchant}   ${e.currency} %.2f".format(e.amount)
-                textSize = 16f; setPadding(6,12,6,12)
+        val density = resources.displayMetrics.density
+        fun dp(value: Int) = (value * density).toInt()
+        list.sortedByDescending { e ->
+            try { SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).parse(e.date)?.time ?: 0L }
+            catch (_: Exception) { 0L }
+        }.forEach { e ->
+            val card = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(14), dp(14), dp(14), dp(14))
+                setBackgroundResource(R.drawable.bg_expense_row)
+                elevation = dp(1).toFloat()
+                isClickable = true
+                isFocusable = true
                 setOnClickListener { showActions(e) }
             }
-            b.containerSpese.addView(row)
+            val icon = TextView(this).apply {
+                text = "▣"
+                textSize = 24f
+                setTextColor(Color.rgb(18, 105, 211))
+                gravity = Gravity.CENTER
+            }
+            card.addView(icon, LinearLayout.LayoutParams(dp(36), dp(44)))
+            val details = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(10), 0, dp(8), 0)
+            }
+            details.addView(TextView(this).apply {
+                text = e.merchant.ifBlank { "Spesa" }
+                textSize = 16f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(Color.rgb(19, 44, 77))
+                maxLines = 2
+            })
+            details.addView(TextView(this).apply {
+                text = e.date
+                textSize = 12f
+                setTextColor(Color.rgb(103, 121, 145))
+            })
+            card.addView(details, LinearLayout.LayoutParams(0, -2, 1f))
+            card.addView(TextView(this).apply {
+                text = "%s %.2f".format(Locale.ITALY, e.currency, e.amount)
+                textSize = 15f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(Color.rgb(19, 44, 77))
+            })
+            b.containerSpese.addView(card, LinearLayout.LayoutParams(-1, -2).apply {
+                bottomMargin = dp(9)
+            })
         }
-        val totals = list.groupBy { it.currency }.map { (c, l) -> "$c %.2f".format(l.sumOf { it.amount }) }
-        b.tvTotali.text = if (totals.isEmpty()) "Nessuna spesa nel mese selezionato" else "Totali: " + totals.joinToString("  |  ")
+        if (list.isEmpty()) {
+            b.containerSpese.addView(TextView(this).apply {
+                text = "Nessun movimento nel mese selezionato.\nAggiungi una spesa per iniziare."
+                textSize = 14f
+                gravity = Gravity.CENTER
+                setTextColor(Color.rgb(103, 121, 145))
+                setPadding(dp(18), dp(28), dp(18), dp(28))
+                setBackgroundResource(R.drawable.bg_surface)
+            })
+        }
+        val totals = list.groupBy { it.currency }
+            .map { (c, l) -> "%s %.2f".format(Locale.ITALY, c, l.sumOf { it.amount }) }
+        b.tvTotali.text = if (totals.isEmpty()) "Nessuna spesa" else totals.joinToString("   •   ")
+        b.tvNumeroSpese.text = "${list.size} movimenti registrati"
+        b.tvConteggio.text = "${list.size} voci"
     }
 
     private fun expensesForSelectedMonth(): List<Expense> {
