@@ -6,7 +6,7 @@ android {
     namespace = "com.notaspese.app"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.notaspese.app"
+        applicationId = "com.spese.indipendente"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
