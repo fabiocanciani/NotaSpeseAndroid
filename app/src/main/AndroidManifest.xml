@@ -4,6 +4,8 @@
     <application
         android:allowBackup="true"
         android:label="Spese"
+        android:icon="@drawable/ic_spese"
+        android:roundIcon="@drawable/ic_spese"
         android:theme="@style/Theme.NotaSpese">
         <provider
             android:name="androidx.core.content.FileProvider"
