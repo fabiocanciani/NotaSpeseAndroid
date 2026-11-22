@@ -14,9 +14,14 @@
         android:paddingEnd="16dp">
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="NOTA SPESE" android:textStyle="bold" android:textSize="26sp"
+            android:text="Spese • riepilogo" android:textStyle="bold" android:textSize="30sp" android:textColor="#0B477D"
             android:layout_marginBottom="12dp"/>
 
+        <Button android:id="@+id/toggleProfilo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Dati personali  ▾"/>
+        <LinearLayout android:id="@+id/profiloDettagli" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:padding="12dp" android:background="#EAF3FA">
         <EditText android:id="@+id/etNome" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:hint="Nome"/>
         <EditText android:id="@+id/etCognome" android:layout_width="match_parent"
@@ -28,16 +33,20 @@
 
         <Button android:id="@+id/btnSalvaProfilo" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Salva intestazione"/>
+        </LinearLayout>
         <Button android:id="@+id/btnFoto" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Scatta foto scontrino"
+            android:layout_height="wrap_content" android:text="Fotografa scontrino"
             android:layout_marginTop="12dp"/>
         <Button android:id="@+id/btnImporta" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Importa PDF, JPG o PNG"/>
         <Button android:id="@+id/btnManuale" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Aggiungi spesa manualmente"/>
+            android:layout_height="wrap_content" android:text="＋  Aggiungi spesa"/>
         <Button android:id="@+id/btnEliminaPeriodo" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Cancella spese dalla data / alla data"/>
+            android:layout_height="wrap_content" android:text="Gestisci / elimina spese per periodo"/>
 
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Riepilogo mensile" android:textStyle="bold" android:textSize="20sp"
+            android:textColor="#0B477D" android:paddingTop="16dp"/>
         <TextView android:id="@+id/tvTotali" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:textStyle="bold"
             android:textSize="18sp" android:paddingTop="12dp" android:paddingBottom="8dp"/>
