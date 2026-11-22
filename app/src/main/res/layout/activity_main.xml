@@ -46,7 +46,7 @@
             android:layout_height="wrap_content" android:orientation="vertical"/>
 
         <Button android:id="@+id/btnPdf" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Genera PDF nota spese"
+            android:layout_height="wrap_content" android:text="Esporta riepilogo PDF"
             android:layout_marginTop="16dp"/>
         <Button android:id="@+id/btnStampa" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:text="Stampa nota spese del mese"/>
