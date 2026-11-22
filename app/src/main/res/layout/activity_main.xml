@@ -54,13 +54,13 @@
             <LinearLayout android:id="@+id/profiloDettagli" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:orientation="vertical" android:padding="6dp">
                 <EditText android:id="@+id/etNome" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:hint="Nome" android:inputType="textPersonName"android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
+                    android:hint="Nome" android:inputType="textPersonName" android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
                 <EditText android:id="@+id/etCognome" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:hint="Cognome" android:inputType="textPersonName"android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
+                    android:hint="Cognome" android:inputType="textPersonName" android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
                 <EditText android:id="@+id/etAzienda" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:hint="Azienda di riferimento" android:inputType="textCapWords"android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
+                    android:hint="Azienda di riferimento" android:inputType="textCapWords" android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
                 <EditText android:id="@+id/etMese" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:hint="Mese (AAAA-MM)" android:inputType="date"android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
+                    android:hint="Mese (AAAA-MM)" android:inputType="date" android:textColor="#17324F" android:textColorHint="#71839A" android:backgroundTint="#1269D3" />
                 <Button android:id="@+id/btnSalvaProfilo" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:text="Salva dati e aggiorna mese" android:textAllCaps="false"/>
             </LinearLayout>
