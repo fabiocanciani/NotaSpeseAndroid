@@ -14,6 +14,7 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
 import android.print.PrintManager
+import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -67,6 +68,13 @@ class MainActivity : AppCompatActivity() {
         expenses.addAll(store.loadExpenses())
         refresh()
 
+        b.profiloDettagli.visibility = View.GONE
+        b.toggleProfilo.setOnClickListener {
+            b.profiloDettagli.visibility =
+                if (b.profiloDettagli.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            b.toggleProfilo.text =
+                if (b.profiloDettagli.visibility == View.VISIBLE) "👤  Dati personali  ▴" else "👤  Dati personali  ▾"
+        }
         b.btnSalvaProfilo.setOnClickListener { saveProfile(); toast("Intestazione salvata") }
         b.btnFoto.setOnClickListener { ensureCamera() }
         b.btnImporta.setOnClickListener { chooseDocument.launch(arrayOf("application/pdf", "image/jpeg", "image/png")) }
